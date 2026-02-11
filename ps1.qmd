@@ -1,23 +1,21 @@
 ---
-title: "ps1"
+title: "Gov 51 PS1"
 author: "Sage Piekarski" 
-#Git URL: visual https://github.com/sagepiekarski-ai/gov51-ps1.git
 ---
-
-## Quarto
-
-Quarto enables you to weave together content and executable code into a finished document. To learn more about Quarto see <https://quarto.org>.
-
-## Running Code
-
-When you click the **Render** button a document will be generated that includes both content and the output of embedded code. You can embed code like this:
 
 1.  Project Setup
 
 ```{r}
+
+#Git URL: visual https://github.com/sagepiekarski-ai/gov51-ps1.git
+
 #loading ipumsr
 ##install.packages('ipumsr')
 library('ipumsr')
+
+#loading tidyverse
+##install.packages("tidyverse")
+library(tidyverse)
 
 #instructions from IPUMS page
 ddi <- read_ipums_ddi("data/raw/acs2024.xml")
@@ -45,23 +43,30 @@ acs2024csv <- read.csv("data/raw/acs2024.csv")
 acs2024_clean <- acs2024csv %>% 
   select(STATEFIP, AGE, SEX, EDUC, EMPSTAT, TRANTIME, INCTOT)
 
-##Question 2
+#Question 2
 
-#STATEFIP reports the state in which the household was located using the Federal Information Processing Standards (FIPS) coding scheme.
+#STATEFIP reports the state in which the household was located using the Federal
+#Information Processing Standards (FIPS) coding scheme.
 
 #AGE reports the person's age in years as of the last birthday.
 
 #SEX reports whether the person was male or female.
 
-#EDUC indicates respondents' educational attainment, as measured by the highest year of school or degree completed.
+#EDUC indicates respondents' educational attainment, as measured by the highest 
+#year of school or degree completed.
 
-#EMPSTAT indicates whether the respondent was a part of the labor force -- working or seeking work -- and, if so, whether the person was currently unemployed. 
+#EMPSTAT indicates whether the respondent was a part of the labor force -- 
+#working or seeking work -- and, if so, whether the person was currently 
+#unemployed. 
 
-#TRANTIME reports the total amount of time, in minutes, that it usually took the respondent to get from home to work last week. A code of zero represents 
+#TRANTIME reports the total amount of time, in minutes, that it usually took the 
+#respondent to get from home to work last week. A code of zero represents 
 
-#INCTOT reports each respondent's total pre-tax personal income or losses from all sources for the previous year. Measured in $.
+#INCTOT reports each respondent's total pre-tax personal income or losses from 
+#all sources for the previous year. Measured in $.
 
-#PERWT indicates how many persons in the U.S. population are represented by a given person in an IPUMS sample.
+#PERWT indicates how many persons in the U.S. population are represented by a 
+#given person in an IPUMS sample.
 
 #female is 1 if female and 0 if male.
 
@@ -77,7 +82,14 @@ acs2024_clean <- acs2024_clean %>%
          unemployed = case_when(EMPSTAT == 2 ~ 1, TRUE ~ 0), 
          not_in_labor_force = case_when(EMPSTAT == 3 ~ 1, TRUE ~ 0))
          
-#Question 4 if you accidentally treated “N/A” codes as real zeros when calculating summary statistics you could run into some major problems. For instance, some zeros represent actual values rather than N/A codes. As such, if you were to treat n/a or missing values as zeros, it would count more zero values than there truly are. A good example of this could be the female variable in which a zero represents a male; if we treated all n/a counts observations as zeros, we would get a count of males significantly larger than the true value. 
+#Question 4 if you accidentally treated “N/A” codes as real zeros when 
+#calculating summary statistics you could run into some major problems. For 
+#instance, some zeros represent actual values rather than N/A codes. As such, 
+#if you were to treat n/a or missing values as zeros, it would count more zero 
+#values than there truly are. A good example of this could be the female 
+#variable in which a zero represents a male; if we treated all n/a counts 
+#observations as zeros, we would get a count of males significantly larger 
+#than the true value. 
 
 ##Question 5 
 #Create a Summary Statistics Table 
@@ -150,7 +162,11 @@ knitr::kable(summary_stats_table, digits = 1,
              caption = "Table 1: Summary Statistics for 2024 ACS Sample")
 
 #Question 6
-#Based on this table, the maximum commute time taken is 195 minutes or approximately 3 hours and 15 minutes. I suppose this commute time could be a daily commute, but is far beyond the amount of time I would drive as a daily commute. If the money or experience is good enough I am sure one could be compelled to do anything. 
+#Based on this table, the maximum commute time taken is 195 minutes or 
+#approximately 3 hours and 15 minutes. I suppose this commute time could be a 
+#daily commute, but is far beyond the amount of time I would drive as a daily 
+#commute. If the money or experience is good enough I am sure one could be 
+#compelled to do anything. 
 
 
 
@@ -175,25 +191,35 @@ acs2024_test <- acs2024_clean %>%
             n = sum(!is.na(TRANTIME)))
 print(acs2024_test)
 
-#It is likely that these people who do not have a commute time are those that are n/a, unemployed or not in the labor force as displayed in the table below.  
+#It is likely that these people who do not have a commute time are those that 
+#are n/a, unemployed or not in the labor force as displayed in the table below.  
 
 #Question 2
 commuters <- acs2024_clean %>% 
   filter(EMPSTAT == 1, TRANTIME > 0) %>% 
-  select(AGE, female, less_than_hs, hs_only, some_college, college_only, advanced_degree, employed,TRANTIME, INCTOT)
-#The only people who wouldn't have a commute would be those that are not commuting to work or who work from home. As such, those that are unemployed or not in the labor force would not count.  Thus, the only people included in the commuter subset are those that are employed and who have a commute time of greater than zero minutes.
+  select(AGE, female, less_than_hs, hs_only, some_college, college_only, 
+         advanced_degree, employed,TRANTIME, INCTOT)
+#The only people who wouldn't have a commute would be those that are not 
+#commuting to work or who work from home. As such, those that are unemployed or
+#not in the labor force would not count.  Thus, the only people included in the 
+#commuter subset are those that are employed and who have a commute time of 
+#greater than zero minutes.
 
 #Question 3
 #Trantime Data with commuter subset
 nrow(commuters)
 #there are now 1359943 observations in our new subset.
 min(commuters$TRANTIME)
-#the new min trantime is 1. This makes sense as for those that commute to their office of employment they can not travel zero minutes unless they work from home.  We weeded these people out by doing TRANTIME>0, to get just people that actually commute into their place of work.
+#the new min trantime is 1. This makes sense as for those that commute to their 
+#office of employment they can not travel zero minutes unless they work from 
+#home.  We weeded these people out by doing TRANTIME>0, to get just people that 
+#actually commute into their place of work.
 
 #Question 4
 summary_stats_table2  <- data.frame(
   Variable = c("Age", "Female", "Less than High School", "High School Only",
-  "Some College", "College Only", "Advanced Degree", "Employed", "Commute Time (mins)", "Total Income ($)"),
+  "Some College", "College Only", "Advanced Degree", "Employed", 
+  "Commute Time (mins)", "Total Income ($)"),
   N = c(sum(!is.na(commuters$AGE)),
         sum(!is.na(commuters$female)),
         sum(!is.na(commuters$less_than_hs)),
@@ -268,7 +294,11 @@ ggplot(commuters, aes (x =TRANTIME)) +
 ggsave("output/commute histogram.png")
 
 #Question 2
-#This histogram is definitely one that is right skewed. The center is around 27ish which is also the commuter subsets trantime mean. It is interesting to see there is a significant spike at about 20 and then there is no data reported for just past 100 to 125. We then see a few additional observation units at around 150. 
+#This histogram is definitely one that is right skewed. The center is around 
+#27ish which is also the commuter subsets trantime mean. It is interesting to 
+#see there is a significant spike at about 20 and then there is no data reported 
+#for just past 100 to 125. We then see a few additional observation units at 
+#around 150. 
 
 #Question 3
 mean(commuters$TRANTIME, na.rm = TRUE)
@@ -276,7 +306,10 @@ mean(commuters$TRANTIME, na.rm = TRUE)
 median(commuters$TRANTIME, na.rm = TRUE)
 #The median of the data is 20.
 
-#This implies that because the mean is greater that the median the graph is right skewed. We know this because mean > median --> right-skewed. This makes sense because the mean places more weight on outliers. We see this exact right-skew in the created histogram. 
+#This implies that because the mean is greater that the median the graph is 
+#right skewed. We know this because mean > median --> right-skewed. This makes 
+#sense because the mean places more weight on outliers. We see this exact 
+#right-skew in the created histogram. 
 
 
 ```
